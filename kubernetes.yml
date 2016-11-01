@@ -1,0 +1,43 @@
+---
+apiVersion: "v1"
+kind: "List"
+items:
+- apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: hello-angular
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          app: hello-angular
+      spec:
+        containers:
+        - name: hello-angular
+          image: eu.gcr.io/inkubator-148208/hello-angular:v1
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: 80
+            initialDelaySeconds: 60
+          ports:
+          - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: "/"
+              port: 80
+            initialDelaySeconds: 10
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: hello-angular
+  spec:
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    selector:
+      app: hello-angular
+    type: LoadBalancer
